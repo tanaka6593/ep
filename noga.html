@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
+
+<head>
+  <meta charset="UTF-8" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Noto Sans JP", sans-serif;
+      overflow: hidden;
+      height: 100%;
+      background-color: #fff;
+    }
+
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s ease-in-out;
+    }
+
+    #page1 {
+      z-index: 1;
+      transform: translateY(0%);
+    }
+
+    #page2 {
+      z-index: 2;
+      transform: translateY(100%);
+      background: #fff;
+      padding: 0 5px 10px;
+      box-sizing: border-box;
+    }
+
+    #page2.show {
+      animation: slideUp 0.4s ease-in-out forwards;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0%);
+      }
+    }
+
+    .image-wrapper {
+      margin-top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .transparent-button {
+      position: absolute;
+      top: 10px;
+      right: 13px;
+      width: 185px;
+      height: 35px;
+      background-color: transparent;
+      border: none;
+      z-index: 5;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .transparent-button:focus,
+    .transparent-button:active {
+      outline: none;
+    }
+
+    #page2 .header-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    #datetime-bar {
+      background-color: #1c8c9b;
+      color: white;
+      margin-top: 12px;
+      padding: 2px 12px;
+      font-size: 16px;
+      text-align: center;
+      font-weight: 900;
+      font-family: "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      border-radius: 0;
+      width: 100vw;
+      position: relative;
+      left: -5px;
+      box-sizing: border-box;
+    }
+
+    #image4 {
+      position: absolute;
+      top: 14px;
+      left: 30px;
+      right: 30px;
+      height: 45px;
+      z-index: 10;
+      display: none;
+      object-fit: contain;
+    }
+
+    #page2 .close-btn {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+    }
+
+    #page2 .close-btn div {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #666;
+      transform-origin: center;
+    }
+
+    #page2 .close-btn .line1 {
+      transform: rotate(45deg);
+    }
+
+    #page2 .close-btn .line2 {
+      transform: rotate(-45deg);
+    }
+
+    #page2 .image1-wrapper {
+      margin-top: 10px;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      overflow: hidden;
+      background-color: white;
+      transition: background-color 0.6s ease;
+    }
+
+    #page2 .image1-wrapper img#image1 {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: auto;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      display: block;
+      transition: transform 0.1s ease;
+    }
+
+    #page2 #image2-wrapper {
+      margin-top: 0px;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    #page2 #swipe-image {
+      width: 100%;
+      height: auto;
+      border-radius: 0;
+      display: block;
+      touch-action: none;
+      pointer-events: none;
+    }
+
+    .image5-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 0;
+      overflow: visible;
+    }
+    .image5-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 0;
+    }
+    .timestamp {
+      position: absolute;
+      bottom: 6px;
+      left: 8px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      color: #333;
+      pointer-events: none;
+      user-select: none;
+    }
+    .transparent-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+  transform: skewX(-20deg);
+  animation: shine 1.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+  <div id="page1" class="page">
+    <div class="image-wrapper">
+      <img src="p1.png"/>
+    </div>
+    <button class="transparent-button" onclick="showPage2()"></button>
+
+  <!-- ↓ ブロック1（情報）ここから ↓ -->
+<div style="
+  background-color: #f5f5f5;
+  margin: 0 8px;
+  padding: 8px 8px; 
+  border-radius: 8px;
+">
+  <div style="font-size: 0.8rem; font-weight: 600; color: #333; margin-bottom: 3px;">7/19(土)・7/20(日)</div>
+  <div style="font-size: 0.8rem; font-weight: 800; color: #333; margin-bottom: 0;">JOIN ALIVE 2025</div>
+  <div style="font-size: 0.6rem; font-weight: 600; color: #333;">いわみざわ公園野外音楽堂キタオン＆グリーンランド</div>
+</div>
+  <!-- ↑ ブロック1ここまで ↑ -->
+
+<!-- 🔲 ブロック2 全体 -->
+<div style="margin-top: 6px;">
+
+  <!-- 🔹 2-1 名前 -->
+  <div style="background-color: #e55abe; margin: 0 8px 0 8px; padding: 6px 8px; border-radius: 8px 8px 0 0;display: flex; justify-content: space-between; align-items: center;">
+    <div id="user-name"><span style="font-size: 1rem; font-weight: 525; color: #FFF;">野上 健一 様</span></div>
+    <div style="font-size: 0.55rem; color: #FFF; white-space: nowrap;">1枚目</div>
+  </div>
+
+
+<!-- 🔹 2-2 券種 + 画像 -->
+<div style="background-color: #feecf0; margin: 0 8px; padding: 6px 8px; border-radius: 0;border-bottom: 1px dashed #000000;">
+  <div style="display: flex; gap: 8px;">
+    
+    <!-- 左側：上画像と下画像 -->
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <img src="misiyou.png" alt="未使用チケット" style="width: 80px; height: 80px; object-fit: cover;" />
+      <img src="bunpai.png" alt="分配済チケット" style="max-width: 85%; height: auto; " />
+    </div>
+
+<!-- 右側：券種 -->
+<div style="display: flex; align-items: flex-start;">
+  <div style="font-size: 0.9rem; font-weight: 700; color: #000;margin-top: 4px;margin-left: -90px;">通し入場券</div>
+</div>
+
+  </div>
+</div>
+
+
+  <!-- 🔹 2-3 概要 -->
+  <div style="background-color: #ffdce8; margin: 0 8px; padding: 6px 8px; border-radius: 0;border-bottom: 1px solid #c4baba;">
+    <div style="font-size: 0.6rem; font-weight: 600; color: #000000;">
+JOIN ALIVE 2025<br>
+2025年7月19日(土)〜20日(日)<br>
+開場9:30/開演 11:00/終演21:00予定<br>
+いわみざわ公園(野外音楽堂キタオン&amp;北海道グリーンランド遊園地)<br>
+◆主催・お問合せ:マウントアライブTEL.050-3504-8700<br>
+(https://www.joinalive.jp)<br>
+●有効期間:7/19(土)9:30〜22:30・7/20(日)9:30〜22:30<br>
+※当日所定の場所にてﾘｽﾄﾊﾞﾝﾄﾞと交換致します。必ず腕に着用下さい。<br>
+※ﾘｽﾄﾊﾞﾝﾄﾞ紛失の場合は再度ﾁｹｯﾄを購入し直すか、ご退場願います。<br>
+※遊園地内のｱﾄﾗｸｼｮﾝは別途料金が必要となります。<br>
+※購入後のｷｬﾝｾﾙ・変更はお受けできません。<br>
+※出演者・出演日の変更・ｷｬﾝｾﾙに伴う払戻は行いません。<br>
+※ｷｬﾝﾌﾟｻｲﾄへの入場可。ｷｬﾝﾌﾟ泊の方は19日9:30〜20日7:00迄ご利用頂けます。<br>
+JOIN ALIVE 2025<br>
+2025年7月19日(土)〜<br>
+2025年7月20日(日)<br>
+いわみざわ公園<br>
+(野外音楽堂キタオン&amp;<br>
+北海道グリーンランド<br>
+遊園地)<br>
+※雨天決行<br>
+&lt;営利目的の転売禁止&gt;<br>
+イープラス 050-3185-6483<br>
+<span style="color: rgb(49, 168, 232);">チケット裏面情報 ></span>
+    </div>
+  </div>
+
+
+<!-- 🔹 2-4 チケット番号 -->
+<div style="background-color: #ffdce8; margin: 0 8px 0 8px; padding: 6px 8px 8px 8px; border-radius: 0 0 8px 8px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <!-- 左側：チケット番号 -->
+    <span style="font-size: 0.7rem; font-weight: 600; color: rgb(49, 168, 232);">チケット番号: 1150071248908</span>
+    <!-- 右側：矢印アイコン -->
+    <svg width="20" height="20" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="rgb(49, 168, 232)" /><polyline points="16,28 24,18 32,28"fill="none" stroke="#FFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </div>
+</div>
+  </div>
+</div>
+
+
+<!-- ============================= -->
+<!-- 🔸 Page 2 表示領域 HTML部 -->
+<!-- ============================= -->
+  <div id="page2" class="page">
+    <!-- 上部：選択状態 + 閉じるボタン -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0">
+      <div class="header-text">
+        <span style="color: #ec4b99">1/1</span>枚 選択中
+      </div>
+      <div class="close-btn" onclick="closePage2()">
+        <div class="line1"></div>
+        <div class="line2"></div>
+      </div>
+    </div>
+
+    <!-- ✅ 日時バー -->
+    <div id="datetime-bar"></div>
+
+    <!-- image1イベント概要 -->
+    <div class="image1-wrapper" id="image1-wrapper">
+      <img src="image1.png" id="image1" alt="画像1" />
+    </div>
+
+    <!-- image2名前券種 -->
+    <div id="image2-wrapper">
+      <!-- 名前表示エリアを追加 -->
+      <div id="page2-name-label" style="position: absolute; top: 6px; left: 10px; color: white; font-size: 1rem; font-weight: 525; z-index: 1; ">萩原 了太 様</div>
+      <!-- image2本体 -->
+      <img src="image2.png" id="swipe-image" alt="画像2" />
+    </div>
+
+    <!-- image4注意画像 -->
+    <img src="image4.png" id="image4" alt="スライド注意" />
+  </div>
+
+
+<!-- ============================= -->
+<!-- 🔸 Page 2 挙動制御 JavaScript部 -->
+<!-- ============================= -->
+<script>
+  const image1 = document.getElementById("image1");
+  const image1Wrapper = document.getElementById("image1-wrapper");
+  const image4 = document.getElementById("image4");
+  const swipeImage = document.getElementById("swipe-image");
+
+  let startX = 0;
+  let isTwoFingerSwipe = false;
+  let blinkInterval = null;
+  let blinkColors = ["#ff0", "#f00"];
+  let blinkIndex = 0;
+
+  let pendingDiffX = 0;           // 🔸 アニメーション用の差分
+  let animationActive = false;    // 🔸 アニメーションON/OFF制御
+
+  // 🔸 requestAnimationFrameで滑らかに移動
+  function smoothTranslate() {
+    image1.style.transform = `translateX(${pendingDiffX}px)`;
+    if (animationActive) {
+      requestAnimationFrame(smoothTranslate);
+    }
+  }
+
+  // ✅ Page2を表示
+  function showPage2() {
+    document.getElementById("page1").style.display = "none";
+    document.getElementById("page2").style.display = "block";
+    document.getElementById("page2").classList.add("show");
+    stopBlink();
+
+    // 🔹 名前をコピーして表示
+    const nameHtml = document.getElementById("user-name").innerHTML;
+    const nameLabel = document.getElementById("page2-name-label");
+    nameLabel.innerHTML = nameHtml;
+    nameLabel.style.display = "block";
+  }
+
+  // ✅ Page2を閉じてPage1へ戻す
+  function closePage2() {
+    document.getElementById("page2").classList.remove("show");
+    setTimeout(() => {
+      document.getElementById("page2").style.display = "none";
+      document.getElementById("page1").style.display = "block";
+      stopBlink();
+      image1.src = "image1.png";
+      image1.style.display = "block";
+      image1.style.transform = "translateX(0)";
+      image4.style.display = "none";
+      const oldImage5Wrapper = document.querySelector(".image5-wrapper");
+      if (oldImage5Wrapper) {
+        oldImage5Wrapper.remove();
+      }
+    }, 400);
+  }
+
+  // ✅ 背景を点滅させる処理
+  function startBlink() {
+    if (blinkInterval) return;
+    blinkInterval = setInterval(() => {
+      image1Wrapper.style.backgroundColor = blinkColors[blinkIndex % 2];
+      blinkIndex++;
+    }, 300);
+  }
+
+  // ✅ 点滅を停止
+  function stopBlink() {
+    clearInterval(blinkInterval);
+    blinkInterval = null;
+    image1Wrapper.style.backgroundColor = "white";
+    blinkIndex = 0;
+  }
+
+  // ✅ 2本指スワイプ開始処理
+  image1.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 2) {
+      isTwoFingerSwipe = true;
+      startX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      image1.src = "image3.png";
+      image4.style.display = "block";
+      startBlink();
+
+      // 🔹 なめらかアニメーション開始
+      animationActive = true;
+      requestAnimationFrame(smoothTranslate);
+    }
+  });
+
+  // ✅ スワイプ中の画像移動処理（transformはrequestAnimationFrameで制御）
+  image1.addEventListener("touchmove", (e) => {
+    if (!isTwoFingerSwipe) return;
+    const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    pendingDiffX = currentX - startX;
+  });
+
+  // ✅ スワイプ終了時の処理
+  image1.addEventListener("touchend", (e) => {
+    if (!isTwoFingerSwipe) return;
+
+    animationActive = false; // 🔹 アニメーション停止
+
+    const screenWidth = window.innerWidth;
+    let sumX = 0;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      sumX += e.changedTouches[i].clientX;
+    }
+    const avgX = sumX / e.changedTouches.length;
+    const diffX = avgX - startX;
+    const movedRatio = Math.abs(diffX) / screenWidth;
+
+    if (movedRatio >= 0.5) {
+      const oldImage5Wrapper = document.querySelector(".image5-wrapper");
+      if (oldImage5Wrapper) oldImage5Wrapper.remove();
+
+      const image5Wrapper = document.createElement("div");
+      image5Wrapper.className = "image5-wrapper";
+
+      const image5 = document.createElement("img");
+      image5.src = "image5.png";
+      image5.alt = "画像5";
+
+      const timeText = document.createElement("div");
+      timeText.className = "timestamp";
+
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      const w = ["日", "月", "火", "水", "木", "金", "土"][now.getDay()];
+      const h = String(now.getHours()).padStart(2, "0");
+      const mi = String(now.getMinutes()).padStart(2, "0");
+      timeText.textContent = `使用日時: ${y}/${m}/${d}(${w}) ${h}:${mi}`;
+
+      // 名前ラベル追加
+      const nameFromHeader = document.getElementById("user-name").innerHTML;
+      const nameLabel = document.createElement("div");
+      nameLabel.innerHTML = nameFromHeader;
+      nameLabel.style.position = "absolute";
+      nameLabel.style.top = "145px";
+      nameLabel.style.left = "10px";
+      nameLabel.style.color = "white";
+      nameLabel.style.fontSize = "1rem";
+      nameLabel.style.zIndex = "1";
+      nameLabel.style.pointerEvents = "none";
+
+      image5Wrapper.style.position = "relative";
+      image5Wrapper.appendChild(nameLabel);
+      image5Wrapper.appendChild(image5);
+      image5Wrapper.appendChild(timeText);
+      image1.style.display = "none";
+      swipeImage.style.display = "none";
+      image1Wrapper.appendChild(image5Wrapper);
+    } else {
+      image1.style.transform = "translateX(0)";
+    }
+
+    // ✅ 終了後、状態リセット
+    image1.src = "image1.png";
+    image4.style.display = "none";
+    stopBlink();
+    isTwoFingerSwipe = false;
+    pendingDiffX = 0;
+  });
+
+  // ✅ ピンチズーム誤操作防止
+  document.addEventListener(
+    "touchmove",
+    function (e) {
+      if (e.touches.length > 1) e.preventDefault();
+    },
+    { passive: false }
+  );
+
+  // ✅ 現在時刻のリアルタイム表示
+  function updateDateTime() {
+    const bar = document.getElementById("datetime-bar");
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const w = ["日", "月", "火", "水", "木", "金", "土"][now.getDay()];
+    const h = String(now.getHours()).padStart(2, "0");
+    const mi = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
+    const ms = String(now.getMilliseconds()).padStart(3, "0").slice(0, 2);
+    bar.textContent = `${y}/${m}/${d} (${w}) ${h}:${mi}:${s}.${ms}`;
+  }
+  setInterval(updateDateTime, 50);
+  updateDateTime();
+</script>
