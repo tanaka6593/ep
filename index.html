@@ -257,8 +257,7 @@
 
   <!-- 🔹 2-1 名前 -->
   <div style="background-color: #e55abe; margin: 0 8px 0 8px; padding: 6px 8px; border-radius: 8px 8px 0 0;display: flex; justify-content: space-between; align-items: center;">
-    <div><span style="font-size: 1rem; font-weight: 525; color: #FFF;">萩原 良太</span>
-    <span style="font-size: 1rem; font-weight: 525; color: #FFF;">様</span></div>
+    <div id="user-name"><span style="font-size: 1rem; font-weight: 525; color: #FFF;">萩原 良太 様</span></div>
     <div style="font-size: 0.55rem; color: #FFF; white-space: nowrap;">1枚目</div>
   </div>
 
@@ -326,8 +325,11 @@ JOIN ALIVE 2025<br>
 </div>
 
 
-
+<!-- ============================= -->
+<!-- 🔸 Page 2 表示領域 HTML部 -->
+<!-- ============================= -->
   <div id="page2" class="page">
+    <!-- 上部：選択状態 + 閉じるボタン -->
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0">
       <div class="header-text">
         <span style="color: #ec4b99">1/1</span>枚 選択中
@@ -337,17 +339,32 @@ JOIN ALIVE 2025<br>
         <div class="line2"></div>
       </div>
     </div>
+
+    <!-- ✅ 日時バー -->
     <div id="datetime-bar"></div>
-    <img src="image4.png" id="image4" alt="補助画像" />
+
+
+    <!-- image1イベント概要 -->
     <div class="image1-wrapper" id="image1-wrapper">
       <img src="image1.png" id="image1" alt="画像1" />
     </div>
 
+    <!-- image2名前券種 -->
     <div id="image2-wrapper">
+      <!-- 名前表示エリアを追加 -->
+      <div id="page2-name-label" style="position: absolute; top: 6px; left: 10px; color: white; font-size: 1rem; font-weight: 525; z-index: 1; ">萩原 了太 様</div>
+      <!-- image2本体 -->
       <img src="image2.png" id="swipe-image" alt="画像2" />
     </div>
+
+    <!-- image4注意画像 -->
+    <img src="image4.png" id="image4" alt="スライド注意" />
   </div>
 
+
+<!-- ============================= -->
+<!-- 🔸 Page 2 挙動制御 JavaScript部 -->
+<!-- ============================= -->
   <script>
     const image1 = document.getElementById("image1");
     const image1Wrapper = document.getElementById("image1-wrapper");
@@ -360,6 +377,7 @@ JOIN ALIVE 2025<br>
     let blinkColors = ["#ff0", "#f00"];
     let blinkIndex = 0;
 
+    // ✅ Page2を表示
     function showPage2() {
       document.getElementById("page1").style.display = "none";
       document.getElementById("page2").style.display = "block";
@@ -367,6 +385,7 @@ JOIN ALIVE 2025<br>
       stopBlink();
     }
 
+    // ✅ Page2を閉じてPage1へ戻す
     function closePage2() {
       document.getElementById("page2").classList.remove("show");
       setTimeout(() => {
@@ -385,6 +404,7 @@ JOIN ALIVE 2025<br>
       }, 400);
     }
 
+    // ✅ 背景を点滅させる処理
     function startBlink() {
       if (blinkInterval) return;
       blinkInterval = setInterval(() => {
@@ -393,6 +413,7 @@ JOIN ALIVE 2025<br>
       }, 300);
     }
 
+    // ✅ 点滅を停止
     function stopBlink() {
       clearInterval(blinkInterval);
       blinkInterval = null;
@@ -400,6 +421,7 @@ JOIN ALIVE 2025<br>
       blinkIndex = 0;
     }
 
+    // ✅ 2本指スワイプ開始処理
     image1.addEventListener("touchstart", (e) => {
       if (e.touches.length === 2) {
         isTwoFingerSwipe = true;
@@ -410,6 +432,7 @@ JOIN ALIVE 2025<br>
       }
     });
 
+    // ✅ スワイプ中の画像移動処理
     image1.addEventListener("touchmove", (e) => {
       if (!isTwoFingerSwipe) return;
       const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
@@ -419,6 +442,7 @@ JOIN ALIVE 2025<br>
       });
     });
 
+    // ✅ スワイプ終了時の処理
     image1.addEventListener("touchend", (e) => {
       if (!isTwoFingerSwipe) return;
 
@@ -465,12 +489,14 @@ JOIN ALIVE 2025<br>
         image1.style.transform = "translateX(0)";
       }
 
+      // ✅ 終了後、状態リセット
       image1.src = "image1.png";
       image4.style.display = "none";
       stopBlink();
       isTwoFingerSwipe = false;
     });
 
+    // ✅ ピンチズーム誤操作防止
     document.addEventListener(
       "touchmove",
       function (e) {
@@ -479,6 +505,7 @@ JOIN ALIVE 2025<br>
       { passive: false }
     );
 
+    // ✅ 現在時刻のリアルタイム表示
     function updateDateTime() {
       const bar = document.getElementById("datetime-bar");
       const now = new Date();
@@ -494,6 +521,20 @@ JOIN ALIVE 2025<br>
     }
     setInterval(updateDateTime, 50);
     updateDateTime();
+
+    function showPage2() {
+  document.getElementById("page1").style.display = "none";
+  document.getElementById("page2").style.display = "block";
+  document.getElementById("page2").classList.add("show");
+  stopBlink();
+
+  // 🔹 名前をコピーして表示
+  const nameHtml = document.getElementById("user-name").innerHTML;
+  const nameLabel = document.getElementById("page2-name-label");
+  nameLabel.innerHTML = nameHtml;
+  nameLabel.style.display = "block";
+}
+
   </script>
 </body>
 </html>
