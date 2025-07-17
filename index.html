@@ -257,7 +257,7 @@
 
   <!-- 🔹 2-1 名前 -->
   <div style="background-color: #e55abe; margin: 0 8px 0 8px; padding: 6px 8px; border-radius: 8px 8px 0 0;display: flex; justify-content: space-between; align-items: center;">
-    <div id="user-name"><span style="font-size: 1rem; font-weight: 525; color: #FFF;">萩原 a太 様</span></div>
+    <div id="user-name"><span style="font-size: 1rem; font-weight: 525; color: #FFF;">萩原 太 様</span></div>
     <div style="font-size: 0.55rem; color: #FFF; white-space: nowrap;">1枚目</div>
   </div>
 
@@ -364,162 +364,129 @@ JOIN ALIVE 2025<br>
 <!-- ============================= -->
 <!-- 🔸 Page 2 挙動制御 JavaScript部 -->
 <!-- ============================= -->
-  <script>
-    const image1 = document.getElementById("image1");
-    const image1Wrapper = document.getElementById("image1-wrapper");
-    const image4 = document.getElementById("image4");
-    const swipeImage = document.getElementById("swipe-image");
+<script>
+  const image1 = document.getElementById("image1");
+  const image1Wrapper = document.getElementById("image1-wrapper");
+  const image4 = document.getElementById("image4");
+  const swipeImage = document.getElementById("swipe-image");
 
-    let startX = 0;
-    let isTwoFingerSwipe = false;
-    let blinkInterval = null;
-    let blinkColors = ["#ff0", "#f00"];
-    let blinkIndex = 0;
+  let startX = 0;
+  let isTwoFingerSwipe = false;
+  let blinkInterval = null;
+  let blinkColors = ["#ff0", "#f00"];
+  let blinkIndex = 0;
 
-    // ✅ Page2を表示
-    function showPage2() {
-      document.getElementById("page1").style.display = "none";
-      document.getElementById("page2").style.display = "block";
-      document.getElementById("page2").classList.add("show");
-      stopBlink();
+  let pendingDiffX = 0;           // 🔸 アニメーション用の差分
+  let animationActive = false;    // 🔸 アニメーションON/OFF制御
+
+  // 🔸 requestAnimationFrameで滑らかに移動
+  function smoothTranslate() {
+    image1.style.transform = `translateX(${pendingDiffX}px)`;
+    if (animationActive) {
+      requestAnimationFrame(smoothTranslate);
     }
-
-    // ✅ Page2を閉じてPage1へ戻す
-    function closePage2() {
-      document.getElementById("page2").classList.remove("show");
-      setTimeout(() => {
-        document.getElementById("page2").style.display = "none";
-        document.getElementById("page1").style.display = "block";
-        stopBlink();
-        image1.src = "image1.png";
-        image1.style.display = "block";
-        image1.style.transform = "translateX(0)";
-        image4.style.display = "none";
-        // image5 wrapperがあれば削除
-        const oldImage5Wrapper = document.querySelector(".image5-wrapper");
-        if (oldImage5Wrapper) {
-          oldImage5Wrapper.remove();
-        }
-      }, 400);
-    }
-
-    // ✅ 背景を点滅させる処理
-    function startBlink() {
-      if (blinkInterval) return;
-      blinkInterval = setInterval(() => {
-        image1Wrapper.style.backgroundColor = blinkColors[blinkIndex % 2];
-        blinkIndex++;
-      }, 300);
-    }
-
-    // ✅ 点滅を停止
-    function stopBlink() {
-      clearInterval(blinkInterval);
-      blinkInterval = null;
-      image1Wrapper.style.backgroundColor = "white";
-      blinkIndex = 0;
-    }
-
-    // ✅ 2本指スワイプ開始処理
-    image1.addEventListener("touchstart", (e) => {
-      if (e.touches.length === 2) {
-        isTwoFingerSwipe = true;
-        startX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        image1.src = "image3.png";
-        image4.style.display = "block";
-        startBlink();
-      }
-    });
-
-    // ✅ スワイプ中の画像移動処理
-let pendingDiffX = 0;
-let animationActive = false;
-
-function smoothTranslate() {
-  image1.style.transform = `translateX(${pendingDiffX}px)`;
-  if (animationActive) {
-    requestAnimationFrame(smoothTranslate);
   }
-}
 
-    // ✅ スワイプ終了時の処理
-    image1.addEventListener("touchend", (e) => {
-      if (!isTwoFingerSwipe) return;
+  // ✅ Page2を表示
+  function showPage2() {
+    document.getElementById("page1").style.display = "none";
+    document.getElementById("page2").style.display = "block";
+    document.getElementById("page2").classList.add("show");
+    stopBlink();
 
-      const screenWidth = window.innerWidth;
-      let sumX = 0;
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        sumX += e.changedTouches[i].clientX;
-      }
-      const avgX = sumX / e.changedTouches.length;
-      const diffX = avgX - startX;
+    // 🔹 名前をコピーして表示
+    const nameHtml = document.getElementById("user-name").innerHTML;
+    const nameLabel = document.getElementById("page2-name-label");
+    nameLabel.innerHTML = nameHtml;
+    nameLabel.style.display = "block";
+  }
 
-      const movedRatio = Math.abs(diffX) / screenWidth;
-
-      if (movedRatio >= 0.5) {
-        const oldImage5Wrapper = document.querySelector(".image5-wrapper");
-        if (oldImage5Wrapper) oldImage5Wrapper.remove();
-
-        const image5Wrapper = document.createElement("div");
-        image5Wrapper.className = "image5-wrapper";
-
-        const image5 = document.createElement("img");
-        image5.src = "image5.png";
-        image5.alt = "画像5";
-
-        const timeText = document.createElement("div");
-        timeText.className = "timestamp";
-
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, "0");
-        const d = String(now.getDate()).padStart(2, "0");
-        const w = ["日", "月", "火", "水", "木", "金", "土"][now.getDay()];
-        const h = String(now.getHours()).padStart(2, "0");
-        const mi = String(now.getMinutes()).padStart(2, "0");
-        timeText.textContent = `使用日時: ${y}/${m}/${d}(${w}) ${h}:${mi}`;
-
-        // 名前ラベル追加
-        const nameFromHeader = document.getElementById("user-name").innerHTML;
-        const nameLabel = document.createElement("div");
-        nameLabel.innerHTML = nameFromHeader;
-        nameLabel.style.position = "absolute";
-        nameLabel.style.top = "100px";
-        nameLabel.style.left = "10px";
-        nameLabel.style.color = "white";
-        nameLabel.style.fontSize = "1rem";
-        nameLabel.style.zIndex = "1";
-        nameLabel.style.pointerEvents = "none";
-        image5Wrapper.style.position = "relative"; // 名前ラベルを中に絶対配置するために必要
-        image5Wrapper.appendChild(nameLabel);
-        image5Wrapper.appendChild(image5);
-        image5Wrapper.appendChild(timeText);
-        image1.style.display = "none";
-        swipeImage.style.display = "none";
-        image1Wrapper.appendChild(image5Wrapper);
-      } else {
-        image1.style.transform = "translateX(0)";
-      }
-
-      // ✅ 終了後、状態リセット
-      image1.src = "image1.png";
-      image4.style.display = "none";
+  // ✅ Page2を閉じてPage1へ戻す
+  function closePage2() {
+    document.getElementById("page2").classList.remove("show");
+    setTimeout(() => {
+      document.getElementById("page2").style.display = "none";
+      document.getElementById("page1").style.display = "block";
       stopBlink();
-      isTwoFingerSwipe = false;
-    });
+      image1.src = "image1.png";
+      image1.style.display = "block";
+      image1.style.transform = "translateX(0)";
+      image4.style.display = "none";
+      const oldImage5Wrapper = document.querySelector(".image5-wrapper");
+      if (oldImage5Wrapper) {
+        oldImage5Wrapper.remove();
+      }
+    }, 400);
+  }
 
-    // ✅ ピンチズーム誤操作防止
-    document.addEventListener(
-      "touchmove",
-      function (e) {
-        if (e.touches.length > 1) e.preventDefault();
-      },
-      { passive: false }
-    );
+  // ✅ 背景を点滅させる処理
+  function startBlink() {
+    if (blinkInterval) return;
+    blinkInterval = setInterval(() => {
+      image1Wrapper.style.backgroundColor = blinkColors[blinkIndex % 2];
+      blinkIndex++;
+    }, 300);
+  }
 
-    // ✅ 現在時刻のリアルタイム表示
-    function updateDateTime() {
-      const bar = document.getElementById("datetime-bar");
+  // ✅ 点滅を停止
+  function stopBlink() {
+    clearInterval(blinkInterval);
+    blinkInterval = null;
+    image1Wrapper.style.backgroundColor = "white";
+    blinkIndex = 0;
+  }
+
+  // ✅ 2本指スワイプ開始処理
+  image1.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 2) {
+      isTwoFingerSwipe = true;
+      startX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      image1.src = "image3.png";
+      image4.style.display = "block";
+      startBlink();
+
+      // 🔹 なめらかアニメーション開始
+      animationActive = true;
+      requestAnimationFrame(smoothTranslate);
+    }
+  });
+
+  // ✅ スワイプ中の画像移動処理（transformはrequestAnimationFrameで制御）
+  image1.addEventListener("touchmove", (e) => {
+    if (!isTwoFingerSwipe) return;
+    const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    pendingDiffX = currentX - startX;
+  });
+
+  // ✅ スワイプ終了時の処理
+  image1.addEventListener("touchend", (e) => {
+    if (!isTwoFingerSwipe) return;
+
+    animationActive = false; // 🔹 アニメーション停止
+
+    const screenWidth = window.innerWidth;
+    let sumX = 0;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      sumX += e.changedTouches[i].clientX;
+    }
+    const avgX = sumX / e.changedTouches.length;
+    const diffX = avgX - startX;
+    const movedRatio = Math.abs(diffX) / screenWidth;
+
+    if (movedRatio >= 0.5) {
+      const oldImage5Wrapper = document.querySelector(".image5-wrapper");
+      if (oldImage5Wrapper) oldImage5Wrapper.remove();
+
+      const image5Wrapper = document.createElement("div");
+      image5Wrapper.className = "image5-wrapper";
+
+      const image5 = document.createElement("img");
+      image5.src = "image5.png";
+      image5.alt = "画像5";
+
+      const timeText = document.createElement("div");
+      timeText.className = "timestamp";
+
       const now = new Date();
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, "0");
@@ -527,26 +494,62 @@ function smoothTranslate() {
       const w = ["日", "月", "火", "水", "木", "金", "土"][now.getDay()];
       const h = String(now.getHours()).padStart(2, "0");
       const mi = String(now.getMinutes()).padStart(2, "0");
-      const s = String(now.getSeconds()).padStart(2, "0");
-      const ms = String(now.getMilliseconds()).padStart(3, "0").slice(0, 2);
-      bar.textContent = `${y}/${m}/${d} (${w}) ${h}:${mi}:${s}.${ms}`;
+      timeText.textContent = `使用日時: ${y}/${m}/${d}(${w}) ${h}:${mi}`;
+
+      // 名前ラベル追加
+      const nameFromHeader = document.getElementById("user-name").innerHTML;
+      const nameLabel = document.createElement("div");
+      nameLabel.innerHTML = nameFromHeader;
+      nameLabel.style.position = "absolute";
+      nameLabel.style.top = "150px";
+      nameLabel.style.left = "10px";
+      nameLabel.style.color = "white";
+      nameLabel.style.fontSize = "1rem";
+      nameLabel.style.zIndex = "1";
+      nameLabel.style.pointerEvents = "none";
+
+      image5Wrapper.style.position = "relative";
+      image5Wrapper.appendChild(nameLabel);
+      image5Wrapper.appendChild(image5);
+      image5Wrapper.appendChild(timeText);
+      image1.style.display = "none";
+      swipeImage.style.display = "none";
+      image1Wrapper.appendChild(image5Wrapper);
+    } else {
+      image1.style.transform = "translateX(0)";
     }
-    setInterval(updateDateTime, 50);
-    updateDateTime();
 
-    function showPage2() {
-  document.getElementById("page1").style.display = "none";
-  document.getElementById("page2").style.display = "block";
-  document.getElementById("page2").classList.add("show");
-  stopBlink();
+    // ✅ 終了後、状態リセット
+    image1.src = "image1.png";
+    image4.style.display = "none";
+    stopBlink();
+    isTwoFingerSwipe = false;
+    pendingDiffX = 0;
+  });
 
-  // 🔹 名前をコピーして表示
-  const nameHtml = document.getElementById("user-name").innerHTML;
-  const nameLabel = document.getElementById("page2-name-label");
-  nameLabel.innerHTML = nameHtml;
-  nameLabel.style.display = "block";
-}
+  // ✅ ピンチズーム誤操作防止
+  document.addEventListener(
+    "touchmove",
+    function (e) {
+      if (e.touches.length > 1) e.preventDefault();
+    },
+    { passive: false }
+  );
 
-  </script>
-</body>
-</html>
+  // ✅ 現在時刻のリアルタイム表示
+  function updateDateTime() {
+    const bar = document.getElementById("datetime-bar");
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const w = ["日", "月", "火", "水", "木", "金", "土"][now.getDay()];
+    const h = String(now.getHours()).padStart(2, "0");
+    const mi = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
+    const ms = String(now.getMilliseconds()).padStart(3, "0").slice(0, 2);
+    bar.textContent = `${y}/${m}/${d} (${w}) ${h}:${mi}:${s}.${ms}`;
+  }
+  setInterval(updateDateTime, 50);
+  updateDateTime();
+</script>
