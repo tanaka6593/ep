@@ -257,7 +257,7 @@
 
   <!-- 🔹 2-1 名前 -->
   <div style="background-color: #e55abe; margin: 0 8px 0 8px; padding: 6px 8px; border-radius: 8px 8px 0 0;display: flex; justify-content: space-between; align-items: center;">
-    <div id="user-name"><span style="font-size: 1rem; font-weight: 525; color: #FFF;">原 良太 様</span></div>
+    <div id="user-name"><span style="font-size: 1rem; font-weight: 525; color: #FFF;">萩原 太 様</span></div>
     <div style="font-size: 0.55rem; color: #FFF; white-space: nowrap;">1枚目</div>
   </div>
 
@@ -350,16 +350,14 @@ JOIN ALIVE 2025<br>
 
     <!-- image2名前券種 -->
     <div id="image2-wrapper">
+      <!-- 名前表示エリアを追加 -->
+      <div id="page2-name-label" style="position: absolute; top: 6px; left: 10px; color: white; font-size: 1rem; font-weight: 525; z-index: 1; ">萩原 了太 様</div>
       <!-- image2本体 -->
       <img src="image2.png" id="swipe-image" alt="画像2" />
     </div>
 
     <!-- image4注意画像 -->
     <img src="image4.png" id="image4" alt="スライド注意" />
-
-    <!-- 名前表示エリアを追加 -->
-    <div id="page2-name-label" style="position: absolute; top: 233px; left: 15px; color: white; font-size: 1rem; font-weight: 525; z-index: 1; ">萩原 了太 様</div>
-
   </div>
 
 
@@ -479,6 +477,26 @@ JOIN ALIVE 2025<br>
         const h = String(now.getHours()).padStart(2, "0");
         const mi = String(now.getMinutes()).padStart(2, "0");
         timeText.textContent = `使用日時: ${y}/${m}/${d}(${w}) ${h}:${mi}`;
+
+        // 名前ラベル追加
+        const nameFromHeader = document.getElementById("user-name").innerHTML;
+
+        const nameLabel = document.createElement("div");
+        nameLabel.innerHTML = nameFromHeader;
+        nameLabel.style.position = "absolute";
+        nameLabel.style.top = "8px";
+        nameLabel.style.left = "8px";
+        nameLabel.style.backgroundColor = "rgba(0,0,0,0.6)";
+        nameLabel.style.color = "red";
+        nameLabel.style.padding = "4px 8px";
+        nameLabel.style.borderRadius = "6px";
+        nameLabel.style.fontSize = "0.75rem";
+        nameLabel.style.zIndex = "1";
+        nameLabel.style.pointerEvents = "none";
+
+        image5Wrapper.style.position = "relative"; // 名前ラベルを中に絶対配置するために必要
+        image5Wrapper.appendChild(nameLabel);
+
 
         image5Wrapper.appendChild(image5);
         image5Wrapper.appendChild(timeText);
